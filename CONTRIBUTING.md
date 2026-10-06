@@ -10,8 +10,9 @@ provides release files and the metadata used by the website and desktop updater.
 
 ## Reporting a problem
 
-Search [existing issues](https://github.com/focale-editor/releases/issues) before
-opening a new report. For a download, installation or update problem, include:
+Search [Focale Community issues](https://github.com/focale-editor/community/issues)
+before opening a [bug report](https://github.com/focale-editor/community/issues/new?template=01-bug-report.yml).
+For a download, installation or update problem, include:
 
 - your operating system, its version and processor architecture;
 - the Focale version, including its build number when available;
@@ -21,8 +22,8 @@ opening a new report. For a download, installation or update problem, include:
 
 For update problems, include both the installed version and the offered version.
 Remove credentials, personal information and private project contents from
-attachments. If the problem concerns the editor itself, make that clear so a
-maintainer can route it to the application project.
+attachments. Editor bugs, feature requests, improvements and questions also
+belong in Focale Community, which centralizes user feedback across the project.
 
 ## Working on the repository
 
@@ -95,8 +96,8 @@ the production domain, signatures or an actual application update.
 ## Pull requests
 
 Open your pull request against `main`. Explain the problem and resulting behavior,
-link the related issue with `Fixes #123` when applicable, and describe the checks
-you ran. For installation or update reports, distinguish the platforms you tested
+link the related issue with `Fixes focale-editor/community#123` when applicable,
+and describe the checks you ran. For installation or update reports, distinguish the platforms you tested
 from those you have not exercised.
 
 Use a descriptive title with a Conventional Commits prefix, such as

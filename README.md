@@ -1,4 +1,10 @@
-# Focale releases
+<p align="center">
+  <a href="https://focale-editor.app">
+    <img src=".github/assets/focale.png" alt="Focale app logo" width="112" height="112">
+  </a>
+</p>
+
+<h1 align="center">Get Focale</h1>
 
 The public distribution repository for **Focale**, an image editor for macOS,
 Windows and Linux.
@@ -9,7 +15,7 @@ downloads and learn more about the application.
 ## Downloads
 
 Published versions, release notes and downloadable files are collected in
-[GitHub Releases](https://github.com/focale-editor/releases/releases).
+[GitHub Releases](https://github.com/focale-editor/get-focale/releases).
 Choose the package that matches your operating system and processor:
 
 | Platform | Processor             | Installation package            |
@@ -36,3 +42,9 @@ The metadata is served from `get.focale-editor.app` through GitHub Pages:
   record their size and SHA-256 checksum.
 
 This repository contains distribution files and metadata.
+
+## Feedback and help
+
+Report bugs, installation or update problems, request features, suggest
+improvements and ask questions in [Focale Community](https://github.com/focale-editor/community).
+Include the affected version, platform and download URL when relevant.
