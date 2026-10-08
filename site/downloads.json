@@ -1,6 +1,34 @@
 {
   "releases": [
     {
+      "version": "0.0.6",
+      "buildNumber": 6,
+      "fullVersion": "0.0.6+6",
+      "tag": "0.0.6",
+      "downloads": {
+        "linux-x64": {
+          "url": "https://github.com/focale-editor/get-focale/releases/download/0.0.6/focale-0.0.6-linux-x64.zip",
+          "archive": "https://github.com/focale-editor/get-focale/releases/download/0.0.6/focale-0.0.6-linux-x64.zip",
+          "platformSigned": false
+        },
+        "windows-x64": {
+          "url": "https://github.com/focale-editor/get-focale/releases/download/0.0.6/focale-0.0.6-windows-x64-setup.exe",
+          "archive": "https://github.com/focale-editor/get-focale/releases/download/0.0.6/focale-0.0.6-windows-x64.zip",
+          "platformSigned": false
+        },
+        "macos-arm64": {
+          "url": "https://github.com/focale-editor/get-focale/releases/download/0.0.6/focale-0.0.6-macos-arm64.dmg",
+          "archive": "https://github.com/focale-editor/get-focale/releases/download/0.0.6/focale-0.0.6-macos-arm64.zip",
+          "platformSigned": true
+        },
+        "macos-x64": {
+          "url": "https://github.com/focale-editor/get-focale/releases/download/0.0.6/focale-0.0.6-macos-x64.dmg",
+          "archive": "https://github.com/focale-editor/get-focale/releases/download/0.0.6/focale-0.0.6-macos-x64.zip",
+          "platformSigned": true
+        }
+      }
+    },
+    {
       "version": "0.0.5",
       "buildNumber": 5,
       "fullVersion": "0.0.5+5",

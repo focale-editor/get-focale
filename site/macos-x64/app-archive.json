@@ -45,11 +45,22 @@
         "downloadUrl": "https://github.com/focale-editor/get-focale/releases/download/0.0.5/focale-0.0.5-macos-x64.dmg"
       },
       "release": "https://get.focale-editor.app/macos-x64/releases/0.0.5+5/release.json"
+    },
+    {
+      "version": "0.0.6",
+      "buildNumber": 6,
+      "platform": "macos",
+      "channel": "stable",
+      "mandatory": false,
+      "freshInstall": {
+        "downloadUrl": "https://github.com/focale-editor/get-focale/releases/download/0.0.6/focale-0.0.6-macos-x64.dmg"
+      },
+      "release": "https://get.focale-editor.app/macos-x64/releases/0.0.6+6/release.json"
     }
   ],
   "signature": {
     "algorithm": "ed25519",
     "publicKeyId": "release-7c1f5349ac17b83bc204bd38",
-    "value": "Qif2uYNx7x3AvRI3ak0c3RciNxAcVG31ahvQPZ00NJJHEHnQoli91Oz461n219BdCAbxOXtWKjgCtEZGlGHAAw=="
+    "value": "XDqMWqj6tu0N4pH88q/ACmnGxg/KRbvKqLw6goeNbhxjgKaNq5qt2gaKkmkdsjWlcb5d7xnQz/hVtNNcrOVQAw=="
   }
 }
