@@ -41,7 +41,8 @@ The metadata is served from `get.focale-editor.app` through GitHub Pages:
 - Versioned `release.json` descriptors identify the application archives and
   record their size and SHA-256 checksum.
 
-This repository contains distribution files and metadata.
+This repository contains distribution files, metadata and public compilation
+workflows.
 
 ## Feedback and help
 

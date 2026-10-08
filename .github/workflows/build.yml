@@ -1,0 +1,229 @@
+name: Build Focale packages
+run-name: Build Focale ${{ inputs.tag }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing Focale source release tag
+        required: true
+        type: string
+      source_sha:
+        description: Full immutable source commit supplied by the private workflow
+        required: true
+        type: string
+      prerelease:
+        description: Publish as a preview after all builds succeed
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: focale-build-${{ inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    if: github.repository == 'focale-editor/get-focale' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-26.04
+    environment: private-source
+    outputs:
+      tag: ${{ steps.identity.outputs.tag }}
+      sha: ${{ steps.identity.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Validate requested source identity
+        env:
+          SOURCE_TAG: ${{ inputs.tag }}
+          SOURCE_SHA: ${{ inputs.source_sha }}
+        run: python3 tool/ci/build_identity.py validate-inputs
+      - uses: actions/checkout@v7
+        with:
+          repository: focale-editor/focale
+          ref: refs/tags/${{ inputs.tag }}
+          path: source
+          token: ${{ secrets.FOCALE_SOURCE_READ_TOKEN }}
+          persist-credentials: false
+      - id: identity
+        name: Pin source and record public build provenance
+        env:
+          SOURCE_TAG: ${{ inputs.tag }}
+          SOURCE_SHA: ${{ inputs.source_sha }}
+          IS_PRERELEASE: ${{ inputs.prerelease }}
+        run: python3 tool/ci/build_identity.py record --source source
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-provenance
+          path: build-provenance.json
+          if-no-files-found: error
+          retention-days: 7
+
+  sources:
+    needs: prepare
+    environment: private-source
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          repository: focale-editor/focale
+          ref: ${{ needs.prepare.outputs.sha }}
+          token: ${{ secrets.FOCALE_SOURCE_READ_TOKEN }}
+          persist-credentials: false
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          # Never expose private Git dependencies or generated sources in caches.
+          cache: false
+      - run: flutter pub get --enforce-lockfile
+      - name: Prepare reviewed third-party notices and corresponding sources
+        env:
+          SOURCE_TAG: ${{ needs.prepare.outputs.tag }}
+        run: |
+          python3 tool/licensing/prepare/prepare.py check
+          revision="$(python3 -c 'import json; print(json.load(open("tool/distribution/config.json"))["lensfunRevision"])')"
+          dart run tool/generators/generate_lensfun_catalog/generate_lensfun_catalog.dart --source "https://github.com/lensfun/lensfun/archive/$revision.zip"
+          version="$(python3 -c 'from tool.distribution.release_pipeline import release_pipeline as p; import os; print(p.metadata(os.environ["SOURCE_TAG"])["fullVersion"])')"
+          python3 tool/licensing/prepare/prepare.py bundle --version "$version" --tag "$SOURCE_TAG"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: third-party-sources
+          path: |
+            build/distribution/third-party-sources/*.zip
+            build/distribution/third-party-sources/legal.json
+          if-no-files-found: error
+          retention-days: 7
+
+  build:
+    needs: [prepare, sources]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: linux-x64
+            # Keep the native library baseline below the latest runner image.
+            runner: ubuntu-24.04
+          - target: windows-x64
+            runner: windows-2025-vs2026
+          - target: macos-arm64
+            runner: macos-26
+          - target: macos-x64
+            runner: macos-26-intel
+    environment: private-source
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          repository: focale-editor/focale
+          ref: ${{ needs.prepare.outputs.sha }}
+          token: ${{ secrets.FOCALE_SOURCE_READ_TOKEN }}
+          persist-credentials: false
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          # Never expose private Git dependencies or generated sources in caches.
+          cache: false
+      - if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang g++ cmake ninja-build pkg-config libgtk-3-dev libcurl4-openssl-dev librsvg2-bin
+      - if: runner.os == 'macOS'
+        name: Prepare optional Apple signing and notarization
+        env:
+          FOCALE_MACOS_P12_BASE64: ${{ secrets.FOCALE_MACOS_P12_BASE64 }}
+          FOCALE_MACOS_P12_PASSWORD: ${{ secrets.FOCALE_MACOS_P12_PASSWORD }}
+          FOCALE_MACOS_IDENTITY: ${{ secrets.FOCALE_MACOS_IDENTITY }}
+          FOCALE_APPLE_ID: ${{ secrets.FOCALE_APPLE_ID }}
+          FOCALE_APPLE_TEAM_ID: ${{ secrets.FOCALE_APPLE_TEAM_ID }}
+          FOCALE_APPLE_APP_PASSWORD: ${{ secrets.FOCALE_APPLE_APP_PASSWORD }}
+        run: bash tool/distribution/setup_macos_signing/setup_macos_signing.sh
+      - name: Build archive and installer
+        env:
+          SOURCE_TAG: ${{ needs.prepare.outputs.tag }}
+          DISTRIBUTION_TARGET: ${{ matrix.target }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          SENTRY_ENABLED: ${{ vars.SENTRY_ENABLED || 'true' }}
+          SENTRY_ENVIRONMENT: production
+          FOCALE_MACOS_IDENTITY: ${{ secrets.FOCALE_MACOS_IDENTITY }}
+          FOCALE_WINDOWS_PFX_BASE64: ${{ secrets.FOCALE_WINDOWS_PFX_BASE64 }}
+          FOCALE_WINDOWS_PFX_PASSWORD: ${{ secrets.FOCALE_WINDOWS_PFX_PASSWORD }}
+        shell: bash
+        run: python tool/distribution/release_pipeline/release_pipeline.py build --target "$DISTRIBUTION_TARGET" --tag "$SOURCE_TAG"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.target }}
+          path: |
+            build/distribution/${{ matrix.target }}/*.zip
+            build/distribution/${{ matrix.target }}/*.dmg
+            build/distribution/${{ matrix.target }}/*-setup.exe
+            build/distribution/${{ matrix.target }}/release.json
+            build/distribution/${{ matrix.target }}/distribution.json
+          if-no-files-found: error
+          retention-days: 7
+
+  build-managed:
+    needs: [prepare, sources]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: windows-store-x64
+            runner: windows-2025-vs2026
+          - target: flatpak-x64
+            runner: ubuntu-24.04
+    environment: private-source
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          repository: focale-editor/focale
+          ref: ${{ needs.prepare.outputs.sha }}
+          token: ${{ secrets.FOCALE_SOURCE_READ_TOKEN }}
+          persist-credentials: false
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          # Never expose private Git dependencies or generated sources in caches.
+          cache: false
+      - if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y flatpak flatpak-builder ostree desktop-file-utils appstream rsync
+      - name: Build package without the direct updater
+        env:
+          SOURCE_TAG: ${{ needs.prepare.outputs.tag }}
+          DISTRIBUTION_TARGET: ${{ matrix.target }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          SENTRY_ENABLED: ${{ vars.SENTRY_ENABLED || 'true' }}
+          SENTRY_ENVIRONMENT: production
+        shell: bash
+        run: python tool/distribution/release_pipeline/release_pipeline.py build-managed --target "$DISTRIBUTION_TARGET" --tag "$SOURCE_TAG"
+      - if: runner.os == 'Linux'
+        name: Preserve OSTree files in a tar archive
+        run: tar -czf build/distribution/flatpak-x64/unsigned-repo.tar.gz -C build/distribution/flatpak-x64 repo
+      - if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v7
+        with:
+          name: flatpak-x64
+          path: |
+            build/distribution/flatpak-x64/unsigned-repo.tar.gz
+            build/distribution/flatpak-x64/managed.json
+          if-no-files-found: error
+          retention-days: 7
+      - if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v7
+        with:
+          name: windows-store-x64
+          path: |
+            build/distribution/windows-store-x64/*.msix
+            build/distribution/windows-store-x64/managed.json
+          if-no-files-found: error
+          retention-days: 7
+

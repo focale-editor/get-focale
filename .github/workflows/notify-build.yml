@@ -1,0 +1,39 @@
+name: Resume private publication
+
+on:
+  workflow_run:
+    workflows: [Build Focale packages]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  notify:
+    if: >-
+      github.repository == 'focale-editor/get-focale' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'workflow_dispatch' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    environment: private-source
+    steps:
+      # Never execute scripts from the triggering run's artifacts or source tree.
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/download-artifact@v8
+        with:
+          name: build-provenance
+          path: provenance
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+      - name: Resume signing and publication in the private source repository
+        env:
+          GH_TOKEN: ${{ secrets.FOCALE_PUBLISH_TOKEN }}
+          BUILD_RUN_ID: ${{ github.event.workflow_run.id }}
+        run: python3 tool/ci/build_identity.py notify --file provenance/build-provenance.json

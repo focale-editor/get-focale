@@ -41,6 +41,9 @@ to edit its documentation or Pages files.
 | Path                                      | Purpose                                                     |
 |-------------------------------------------|-------------------------------------------------------------|
 | `README.md` and `CONTRIBUTING.md`         | Public documentation                                        |
+| `.github/workflows/build.yml` | Compiles pinned private release sources on public runners |
+| `.github/workflows/notify-build.yml` | Resumes private publication after successful builds |
+| `tool/ci/` | Validates source identities and publication callbacks |
 | `.github/workflows/pages.yml`             | Deploys `site/` to GitHub Pages                             |
 | `site/index.html`                         | Redirects visitors to downloads on the main website         |
 | `site/CNAME`                              | Custom distribution domain                                  |
@@ -103,3 +106,7 @@ from those you have not exercised.
 Use a descriptive title with a Conventional Commits prefix, such as
 `docs: clarify Linux installation`, `fix: correct the download redirect` or
 `ci: update the Pages runner`. Keep review follow-up commits on the same branch.
+
+Build workflow changes also require `python3 -m unittest tool.ci.build_identity_test`
+and `actionlint .github/workflows/build.yml .github/workflows/notify-build.yml`.
+See [maintainer setup](docs/builds.md) for the protected environment and token scopes.
