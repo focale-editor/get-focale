@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 3,
+  "appName": "Focale",
+  "items": [
+    {
+      "version": "0.0.2",
+      "buildNumber": 2,
+      "platform": "macos",
+      "channel": "stable",
+      "mandatory": false,
+      "freshInstall": {
+        "downloadUrl": "https://github.com/focale-editor/get-focale/releases/download/0.0.2/Focale-0.0.2+2-macos-arm64.dmg"
+      },
+      "release": "https://get.focale-editor.app/macos-arm64/releases/0.0.2+2/release.json"
+    },
+    {
+      "version": "0.0.3",
+      "buildNumber": 3,
+      "platform": "macos",
+      "channel": "stable",
+      "mandatory": false,
+      "freshInstall": {
+        "downloadUrl": "https://github.com/focale-editor/get-focale/releases/download/0.0.3/Focale-0.0.3+3-macos-arm64.dmg"
+      },
+      "release": "https://get.focale-editor.app/macos-arm64/releases/0.0.3+3/release.json"
+    }
+  ],
+  "signature": {
+    "algorithm": "ed25519",
+    "publicKeyId": "release-b8a14cf445e078be6dd48257",
+    "value": "0EdPtY1FF4YS+BxKLxSTcNaa3QERs7Z33MQj6mBei9HxUYTsgD9m71fT9e3m9FGhRzD00RN1sqBSTmn3mSqMCQ=="
+  }
+}
