@@ -1,3 +1,32 @@
 {
-  "releases": []
+  "releases": [
+    {
+      "version": "0.0.2",
+      "buildNumber": 2,
+      "fullVersion": "0.0.2+2",
+      "tag": "0.0.2",
+      "downloads": {
+        "linux-x64": {
+          "url": "https://github.com/focale-editor/get-focale/releases/download/0.0.2/Focale-0.0.2+2-linux-x64.zip",
+          "archive": "https://github.com/focale-editor/get-focale/releases/download/0.0.2/Focale-0.0.2+2-linux-x64.zip",
+          "platformSigned": false
+        },
+        "windows-x64": {
+          "url": "https://github.com/focale-editor/get-focale/releases/download/0.0.2/Focale-0.0.2+2-windows-x64-setup.exe",
+          "archive": "https://github.com/focale-editor/get-focale/releases/download/0.0.2/Focale-0.0.2+2-windows-x64.zip",
+          "platformSigned": false
+        },
+        "macos-arm64": {
+          "url": "https://github.com/focale-editor/get-focale/releases/download/0.0.2/Focale-0.0.2+2-macos-arm64.dmg",
+          "archive": "https://github.com/focale-editor/get-focale/releases/download/0.0.2/Focale-0.0.2+2-macos-arm64.zip",
+          "platformSigned": false
+        },
+        "macos-x64": {
+          "url": "https://github.com/focale-editor/get-focale/releases/download/0.0.2/Focale-0.0.2+2-macos-x64.dmg",
+          "archive": "https://github.com/focale-editor/get-focale/releases/download/0.0.2/Focale-0.0.2+2-macos-x64.zip",
+          "platformSigned": false
+        }
+      }
+    }
+  ]
 }
