@@ -56,11 +56,22 @@
         "downloadUrl": "https://github.com/focale-editor/get-focale/releases/download/0.0.6/focale-0.0.6-linux-x64.zip"
       },
       "release": "https://get.focale-editor.app/linux-x64/releases/0.0.6+6/release.json"
+    },
+    {
+      "version": "0.0.8",
+      "buildNumber": 8,
+      "platform": "linux",
+      "channel": "stable",
+      "mandatory": false,
+      "freshInstall": {
+        "downloadUrl": "https://github.com/focale-editor/get-focale/releases/download/0.0.8/focale-0.0.8-linux-x64.zip"
+      },
+      "release": "https://get.focale-editor.app/linux-x64/releases/0.0.8+8/release.json"
     }
   ],
   "signature": {
     "algorithm": "ed25519",
     "publicKeyId": "release-23f257505e09671b25e2a79d",
-    "value": "5UclIkrZtRiqD82q2mPJPV3t97vbA5vszzqb3c9Di2HxQogC7JYn1CvDG10yvPViGF18Iuob6QeYE8E2PlQHBQ=="
+    "value": "tDqaJa8yicGquJbr1cQFULzM+c0ZteCR6TW48SNUOnW97vgOfSwwRa9+TfRSAVOamCjllUqWT7yJKiIlbJ4ZBQ=="
   }
 }
