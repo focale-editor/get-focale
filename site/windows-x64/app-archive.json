@@ -78,11 +78,22 @@
         "downloadUrl": "https://github.com/focale-editor/get-focale/releases/download/0.0.9/focale-0.0.9-windows-x64-setup.exe"
       },
       "release": "https://get.focale-editor.app/windows-x64/releases/0.0.9+9/release.json"
+    },
+    {
+      "version": "0.0.10",
+      "buildNumber": 10,
+      "platform": "windows",
+      "channel": "stable",
+      "mandatory": false,
+      "freshInstall": {
+        "downloadUrl": "https://github.com/focale-editor/get-focale/releases/download/0.0.10/focale-0.0.10-windows-x64-setup.exe"
+      },
+      "release": "https://get.focale-editor.app/windows-x64/releases/0.0.10+10/release.json"
     }
   ],
   "signature": {
     "algorithm": "ed25519",
     "publicKeyId": "release-a04e2211e4229ea3caf5c2ed",
-    "value": "k4vs7t+cE65OeJn9EYJxm1fiapXi67fiCcPE44O+N+x6H748lChMYmNFccOFnes7yrYcE4lVj36ynbwWhodnDQ=="
+    "value": "v2ZD9KXAbZRsoy3uPC7K/c2Ex/SapxGCVTKtaoAducuWyaxDJPutGLEbBEkYzagvqwPKWgSFEZjSsOEjM217CA=="
   }
 }
