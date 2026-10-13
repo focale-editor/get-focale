@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 3,
+  "packageId": "app.focaleeditor",
+  "appName": "Focale.app",
+  "version": "0.0.5",
+  "buildNumber": 5,
+  "platform": "macos",
+  "channel": "stable",
+  "artifact": {
+    "kind": "zip",
+    "url": "https://github.com/focale-editor/get-focale/releases/download/0.0.5/focale-0.0.5-macos-arm64.zip",
+    "sha256": "8a605c83ca183326d8cd945896d40ed58862390576c954c7d0733df8c2522f43",
+    "length": 29990934
+  },
+  "install": {
+    "strategy": "wholeBundleReplace"
+  },
+  "signature": {
+    "algorithm": "ed25519",
+    "publicKeyId": "release-b8a14cf445e078be6dd48257",
+    "value": "PaxGzXdxyWAjc8yrbiamf+DmMVb8JvfBXxcwCj5CT4Quc/TznSXqEJTkn8P0ruKxzmAMHRdNAWFqPGhIsNVADg=="
+  },
+  "minimumUpdaterVersion": "2.0.0",
+  "generatedAt": "2026-10-08T18:23:05.954723Z"
+}
