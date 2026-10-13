@@ -13,9 +13,9 @@ on:
         required: true
         type: string
       prerelease:
-        description: Publish as a preview after all builds succeed
+        description: Mark the public GitHub release as a pre-release
         required: true
-        default: true
+        default: false
         type: boolean
 
 permissions:
@@ -61,7 +61,7 @@ jobs:
           name: build-provenance
           path: build-provenance.json
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 30
 
   sources:
     needs: prepare
@@ -167,6 +167,91 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+  build-snap:
+    needs: [prepare, sources]
+    if: vars.FOCALE_SNAP_BUILD == 'true'
+    environment: private-source
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          repository: focale-editor/focale
+          ref: ${{ needs.prepare.outputs.sha }}
+          token: ${{ secrets.FOCALE_SOURCE_READ_TOKEN }}
+          persist-credentials: false
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - name: Prepare the Ubuntu 24.04 Snap toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang g++ cmake ninja-build pkg-config libgtk-3-dev libwayland-dev libcurl4-openssl-dev libssl-dev squashfs-tools
+          sudo snap install snapcraft --classic --channel=8.x/stable
+          python -m pip install -r tool/distribution/snap/requirements.txt
+      - name: Compile and package with Snap Store updates
+        env:
+          SOURCE_TAG: ${{ needs.prepare.outputs.tag }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          SENTRY_ENABLED: ${{ vars.SENTRY_ENABLED || 'true' }}
+          SENTRY_ENVIRONMENT: production
+        run: python tool/distribution/release_pipeline/release_pipeline.py build-managed --target snap-x64 --tag "$SOURCE_TAG"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: snap-x64
+          path: |
+            build/distribution/snap-x64/*.snap
+            build/distribution/snap-x64/managed.json
+          if-no-files-found: error
+          retention-days: 30
+
+  build-macos-store:
+    needs: [prepare, sources]
+    if: vars.FOCALE_MAC_STORE_BUILD == 'true'
+    environment: private-source
+    runs-on: macos-26
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          repository: focale-editor/focale
+          ref: ${{ needs.prepare.outputs.sha }}
+          token: ${{ secrets.FOCALE_SOURCE_READ_TOKEN }}
+          persist-credentials: false
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: false
+      - name: Build and sign the universal Mac App Store package
+        env:
+          SOURCE_TAG: ${{ needs.prepare.outputs.tag }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          SENTRY_ENABLED: ${{ vars.SENTRY_ENABLED || 'true' }}
+          SENTRY_ENVIRONMENT: production
+          FOCALE_MAC_STORE_P12_BASE64: ${{ secrets.FOCALE_MAC_STORE_P12_BASE64 }}
+          FOCALE_MAC_STORE_P12_PASSWORD: ${{ secrets.FOCALE_MAC_STORE_P12_PASSWORD }}
+          FOCALE_MAC_STORE_APP_IDENTITY: ${{ secrets.FOCALE_MAC_STORE_APP_IDENTITY }}
+          FOCALE_MAC_STORE_INSTALLER_IDENTITY: ${{ secrets.FOCALE_MAC_STORE_INSTALLER_IDENTITY }}
+          FOCALE_MAC_STORE_APP_PROFILE_BASE64: ${{ secrets.FOCALE_MAC_STORE_APP_PROFILE_BASE64 }}
+          FOCALE_MAC_STORE_QUICKLOOK_PROFILE_BASE64: ${{ secrets.FOCALE_MAC_STORE_QUICKLOOK_PROFILE_BASE64 }}
+          FOCALE_MACOS_P12_BASE64: ${{ secrets.FOCALE_MACOS_P12_BASE64 }}
+          FOCALE_MACOS_P12_PASSWORD: ${{ secrets.FOCALE_MACOS_P12_PASSWORD }}
+          FOCALE_MACOS_IDENTITY: ${{ secrets.FOCALE_MACOS_IDENTITY }}
+          FOCALE_APPLE_TEAM_ID: ${{ secrets.FOCALE_APPLE_TEAM_ID }}
+        run: python3 tool/distribution/release_pipeline/release_pipeline.py build-managed --target macos-store-universal --tag "$SOURCE_TAG"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: macos-store-universal
+          path: |
+            build/distribution/macos-store-universal/*.pkg
+            build/distribution/macos-store-universal/managed.json
+          if-no-files-found: error
+          retention-days: 30
+
   build-managed:
     needs: [prepare, sources]
     strategy:
@@ -225,5 +310,4 @@ jobs:
             build/distribution/windows-store-x64/*.msix
             build/distribution/windows-store-x64/managed.json
           if-no-files-found: error
-          retention-days: 7
-
+          retention-days: 30
