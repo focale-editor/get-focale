@@ -43,7 +43,7 @@ def notify(provenance, run_id):
         'gh', 'workflow', 'run', 'publish.yml', '--repo', SOURCE_REPOSITORY, '--ref', 'main',
         '-f', 'target=publish', '-f', f'tag={provenance["tag"]}',
         '-f', f'prerelease={str(provenance["prerelease"]).lower()}',
-        '-f', 'build_repository=focale-editor/get-focale', '-f', f'build_run_id={run_id}',
+        '-f', f'build_run_id={run_id}',
     ], check=True)
 
 

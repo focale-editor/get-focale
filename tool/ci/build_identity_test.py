@@ -39,8 +39,7 @@ class BuildIdentityTests(unittest.TestCase):
         with patch.object(identity.subprocess, 'run') as run:
             identity.notify(provenance, '12345')
         arguments = run.call_args.args[0]
-        for value in ('target=publish', 'tag=0.0.2', 'build_run_id=12345', 'prerelease=false',
-                      'build_repository=focale-editor/get-focale'):
+        for value in ('target=publish', 'tag=0.0.2', 'build_run_id=12345', 'prerelease=false'):
             self.assertIn(value, arguments)
 
     def test_invalid_callback_never_dispatches(self):
