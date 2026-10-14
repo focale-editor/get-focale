@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 3,
+  "packageId": "app.focaleeditor",
+  "appName": "focale.exe",
+  "version": "0.0.13",
+  "buildNumber": 13,
+  "platform": "windows",
+  "channel": "stable",
+  "artifact": {
+    "kind": "zip",
+    "url": "https://github.com/focale-editor/get-focale/releases/download/0.0.13/focale-0.0.13-windows-x64.zip",
+    "sha256": "07df6c07bd9aa1c71ee9a43b174dd830669fb19dffe1dd19869de46922ebe3fc",
+    "length": 36181531
+  },
+  "install": {
+    "strategy": "wholeDirectoryReplace"
+  },
+  "signature": {
+    "algorithm": "ed25519",
+    "publicKeyId": "release-a04e2211e4229ea3caf5c2ed",
+    "value": "RK8cUvFQf/ueisRVbfxqqQ9ISfhw1+ks+QBVxL8LhOj3Jjvh7vqRBlohEcD/k9LWIEhSHiHhlVVdbmDHI4MQBA=="
+  },
+  "minimumUpdaterVersion": "2.0.0",
+  "generatedAt": "2026-10-14T12:49:06.361063Z"
+}
