@@ -86,6 +86,8 @@ jobs:
       - run: flutter pub get --enforce-lockfile
       - name: Prepare reviewed third-party notices and corresponding sources
         env:
+          # The notice collector authenticates public GitHub API requests.
+          GITHUB_TOKEN: ${{ github.token }}
           SOURCE_TAG: ${{ needs.prepare.outputs.tag }}
         run: python3 tool/distribution/release_pipeline/release_pipeline.py third-party-sources --tag "$SOURCE_TAG"
       - uses: actions/upload-artifact@v7
@@ -135,6 +137,7 @@ jobs:
         run: bash tool/distribution/setup_macos_signing/setup_macos_signing.sh
       - name: Build archive and installer
         env:
+          GITHUB_TOKEN: ${{ github.token }}
           SOURCE_TAG: ${{ needs.prepare.outputs.tag }}
           DISTRIBUTION_TARGET: ${{ matrix.target }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
@@ -192,6 +195,7 @@ jobs:
           python -m pip install -r tool/distribution/snap/requirements.txt
       - name: Build package without the direct updater
         env:
+          GITHUB_TOKEN: ${{ github.token }}
           SOURCE_TAG: ${{ needs.prepare.outputs.tag }}
           DISTRIBUTION_TARGET: ${{ matrix.target }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
