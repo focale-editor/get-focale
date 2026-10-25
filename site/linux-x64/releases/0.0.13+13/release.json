@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 3,
+  "packageId": "app.focaleeditor",
+  "appName": "focale",
+  "version": "0.0.13",
+  "buildNumber": 13,
+  "platform": "linux",
+  "channel": "stable",
+  "artifact": {
+    "kind": "zip",
+    "url": "https://github.com/focale-editor/get-focale/releases/download/0.0.13/focale-0.0.13-linux-x64.zip",
+    "sha256": "b310205faa7e9a6d80c61b676088467987ce674062562722ee298c4925b88221",
+    "length": 33611375
+  },
+  "install": {
+    "strategy": "wholeDirectoryReplace"
+  },
+  "signature": {
+    "algorithm": "ed25519",
+    "publicKeyId": "release-23f257505e09671b25e2a79d",
+    "value": "DWIqXp3b8RgPhY9TLJg2Vk0yP7RQzkQajkCPIVC9EvyfKH3DYexZ1AZAOAr2j8vQPq9ewcNOx23Zul73E8evDQ=="
+  },
+  "minimumUpdaterVersion": "2.0.0",
+  "generatedAt": "2026-10-14T12:36:31.437399Z"
+}
