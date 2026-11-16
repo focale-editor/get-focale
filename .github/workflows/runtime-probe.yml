@@ -1,0 +1,60 @@
+name: Probe notarized macOS runtime
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/runtime-probe.yml
+      - tool/ci/runtime_probe.py
+      - tool/ci/runtime_probe.m
+
+permissions:
+  contents: read
+
+concurrency:
+  group: focale-runtime-probe
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    if: github.repository == 'focale-editor/get-focale' && github.ref == 'refs/heads/main'
+    environment: private-source
+    runs-on: macos-26
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      # Reuse the existing credential setup from the immutable 0.0.19 source.
+      - uses: actions/checkout@v7
+        with:
+          repository: focale-editor/focale
+          ref: 21461c15df29d588a9afd2677cdbfce80f446b21
+          path: source
+          token: ${{ secrets.FOCALE_SOURCE_READ_TOKEN }}
+          persist-credentials: false
+          sparse-checkout: tool/distribution/setup_macos_signing
+      - name: Prepare existing Apple signing credentials
+        env:
+          FOCALE_MACOS_P12_BASE64: ${{ secrets.FOCALE_MACOS_P12_BASE64 }}
+          FOCALE_MACOS_P12_PASSWORD: ${{ secrets.FOCALE_MACOS_P12_PASSWORD }}
+          FOCALE_MACOS_IDENTITY: ${{ secrets.FOCALE_MACOS_IDENTITY }}
+          FOCALE_APPLE_ID: ${{ secrets.FOCALE_APPLE_ID }}
+          FOCALE_APPLE_TEAM_ID: ${{ secrets.FOCALE_APPLE_TEAM_ID }}
+          FOCALE_APPLE_APP_PASSWORD: ${{ secrets.FOCALE_APPLE_APP_PASSWORD }}
+        run: bash source/tool/distribution/setup_macos_signing/setup_macos_signing.sh
+      - name: Sign, notarize and test sandbox loading
+        env:
+          FOCALE_MACOS_IDENTITY: ${{ secrets.FOCALE_MACOS_IDENTITY }}
+        run: python3 tool/ci/runtime_probe.py --output build/runtime-probe
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: macos-runtime-probe
+          path: |
+            build/runtime-probe/runtime-probe.zip
+            build/runtime-probe/notarization.json
+            build/runtime-probe/results.json
+          if-no-files-found: warn
+          retention-days: 7
