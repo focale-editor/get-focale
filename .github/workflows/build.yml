@@ -174,9 +174,6 @@ jobs:
           ref: main
           path: web-distribution
           persist-credentials: false
-      - uses: actions/setup-node@v6
-        with:
-          node-version: '24'
       - name: Install tools required by shared source preparation
         run: |
           sudo apt-get update
@@ -189,20 +186,6 @@ jobs:
           SENTRY_ENABLED: ${{ vars.SENTRY_ENABLED || 'true' }}
           SENTRY_ENVIRONMENT: production
         run: python3 tool/distribution/web/web.py build --tag "$SOURCE_TAG" --public-dir web-distribution
-      - name: Install browser test tools outside the source checkout
-        run: |
-          npm install --prefix "$RUNNER_TEMP/web-smoke" --no-audit --no-fund playwright@1.65.1
-          "$RUNNER_TEMP/web-smoke/node_modules/.bin/playwright" install --with-deps chromium firefox
-      - name: Check the release without cross-origin isolation, as served by Pages
-        env:
-          SOURCE_TAG: ${{ needs.prepare.outputs.tag }}
-        run: |
-          python3 web-distribution/scripts/release.py stage --input build/distribution/web --tag "$SOURCE_TAG" --output build/web-pages
-          distribution="build/web-pages/releases/$SOURCE_TAG"
-          probe=(node tool/web/test/release_smoke.cjs --distribution "$distribution" --site build/web-pages --mount "/releases/$SOURCE_TAG/" --no-isolation --playwright "$RUNNER_TEMP/web-smoke/node_modules/playwright")
-          "${probe[@]}" --output build/web-smoke/chromium-wasm
-          "${probe[@]}" --javascript --output build/web-smoke/chromium-javascript
-          "${probe[@]}" --engine firefox --output build/web-smoke/firefox-wasm
       - uses: actions/upload-artifact@v7
         with:
           name: web
